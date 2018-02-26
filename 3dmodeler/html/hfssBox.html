@@ -1,0 +1,377 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>hfssBox</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-24"><meta name="DC.source" content="hfssBox.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% ----------------------------------------------------------------------------</span>
+<span class="comment">% function hfssBox(fid, Name, Start, Size, Units, [Center1], [Radius1], ...</span>
+<span class="comment">%                  [Axis1], [Center2], [Radius2], [Axis2], ...)</span>
+<span class="comment">%</span>
+<span class="comment">% Description :</span>
+<span class="comment">% -------------</span>
+<span class="comment">% Create the VB Script necessary to create a Box (or Cuboid) in HFSS. This</span>
+<span class="comment">% function also provides for optional holes (specified by their Center,</span>
+<span class="comment">% Radii and Axes) in the box. This feature is useful to allow things like</span>
+<span class="comment">% vias, cables etc., to penetrate the box without intersection violations.</span>
+<span class="comment">%</span>
+<span class="comment">% Parameters :</span>
+<span class="comment">% ------------</span>
+<span class="comment">% fid     - file identifier of the HFSS script file.</span>
+<span class="comment">% Name    - name of the box (appears in HFSS).</span>
+<span class="comment">% Start   - starting location of the box (specify as [x, y, z]).</span>
+<span class="comment">% Size    - size of the box (specify as [sx, sy, sz]).</span>
+<span class="comment">% Units   - units of the box (specify using either 'in', 'mm', 'meter' or</span>
+<span class="comment">%           anything else defined in HFSS).</span>
+<span class="comment">% Center  - (Optional) center of the hole to be punched through the box.</span>
+<span class="comment">%           It can lie anywhere within or on the surface of the box.</span>
+<span class="comment">% Radius  - (Optional) radius of the hole to be punched through the box.</span>
+<span class="comment">% Axis    - (Optional) axis of the hole to be punched through the box.</span>
+<span class="comment">%</span>
+<span class="comment">% Note :</span>
+<span class="comment">% ------</span>
+<span class="comment">% If you happen to specify a hole that lies outside the box, it will have</span>
+<span class="comment">% no effect. The script will run without interruption.</span>
+<span class="comment">%</span>
+<span class="comment">% Example :</span>
+<span class="comment">% ---------</span>
+<span class="comment">% fid = fopen('myantenna.vbs', 'wt');</span>
+<span class="comment">% ...</span>
+<span class="comment">% % a Box with 2 holes punched thro' it.</span>
+<span class="comment">% hfssBox(fid, 'FR4_Base', [-bpHeight/2, -baseLength/2, 0], [bpHeight, ...</span>
+<span class="comment">%         baseLength, -baseThick], 'in', [cX1, cY1, cZ1], R1, 'Z',...</span>
+<span class="comment">%         [cX2, cY2, cZ2], R2, 'X');</span>
+<span class="comment">%</span>
+<span class="comment">% ----------------------------------------------------------------------------</span>
+
+<span class="comment">% ----------------------------------------------------------------------------</span>
+<span class="comment">% This file is part of HFSS-MATLAB-API.</span>
+<span class="comment">%</span>
+<span class="comment">% HFSS-MATLAB-API is free software; you can redistribute it and/or modify it</span>
+<span class="comment">% under the terms of the GNU General Public License as published by the Free</span>
+<span class="comment">% Software Foundation; either version 2 of the License, or (at your option)</span>
+<span class="comment">% any later version.</span>
+<span class="comment">%</span>
+<span class="comment">% HFSS-MATLAB-API is distributed in the hope that it will be useful, but</span>
+<span class="comment">% WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span>
+<span class="comment">% or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License</span>
+<span class="comment">% for more details.</span>
+<span class="comment">%</span>
+<span class="comment">% You should have received a copy of the GNU General Public License along with</span>
+<span class="comment">% Foobar; if not, write to the Free Software Foundation, Inc., 59 Temple</span>
+<span class="comment">% Place, Suite 330, Boston, MA  02111-1307  USA</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright 2004, Vijay Ramasami (rvc@ku.edu)</span>
+<span class="comment">% ----------------------------------------------------------------------------</span>
+<span class="keyword">function</span> hfssBox(fid, Name, Start, Size, Units, varargin)
+Start = reshape(Start, length(Start), 1);
+Size = reshape(Size, length(Size), 1);
+<span class="keyword">if</span> iscell(Start)
+    1;
+<span class="keyword">else</span>
+    Start = mat2cell(Start,[1,1,1],1);
+<span class="keyword">end</span>
+<span class="keyword">if</span> iscell(Size)
+    1;
+<span class="keyword">else</span>
+    Size = mat2cell(Size,[1,1,1],1);
+<span class="keyword">end</span>
+
+<span class="comment">% Preamble.</span>
+fprintf(fid, <span class="string">'\n'</span>);
+fprintf(fid, <span class="string">'oEditor.CreateBox _\n'</span>);
+
+<span class="comment">% Box Parameters.</span>
+fprintf(fid, <span class="string">'Array("NAME:BoxParameters", _\n'</span>);
+<span class="keyword">if</span> isnumeric(Start{1,1})
+    fprintf(fid, <span class="string">'"XPosition:=", "%f%s", _\n'</span>, Start{1,1}, Units);
+<span class="keyword">else</span>
+    fprintf(fid, <span class="string">'"XPosition:=", "%s", _\n'</span>, Start{1,1});
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> isnumeric(Start{2,1})
+    fprintf(fid, <span class="string">'"YPosition:=", "%f%s", _\n'</span>, Start{2,1}, Units);
+<span class="keyword">else</span>
+    fprintf(fid, <span class="string">'"YPosition:=", "%s", _\n'</span>, Start{2,1});
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> isnumeric(Start{3,1})
+   fprintf(fid, <span class="string">'"ZPosition:=", "%f%s", _\n'</span>, Start{3,1}, Units);
+<span class="keyword">else</span>
+     fprintf(fid, <span class="string">'"ZPosition:=", "%s", _\n'</span>, Start{3,1});
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> isnumeric(Size{1,1})
+    fprintf(fid, <span class="string">'"XSize:=", "%f%s", _\n'</span>, Size{1,1}, Units);
+<span class="keyword">else</span>
+    fprintf(fid, <span class="string">'"XSize:=", "%s", _\n'</span>, Size{1,1});
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> isnumeric(Size{2,1})
+    fprintf(fid, <span class="string">'"YSize:=", "%f%s", _\n'</span>, Size{2,1}, Units);
+<span class="keyword">else</span>
+    fprintf(fid, <span class="string">'"YSize:=", "%s", _\n'</span>, Size{2,1});
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> isnumeric(Size{3,1})
+    fprintf(fid, <span class="string">'"ZSize:=", "%f%s"), _\n'</span>, Size{3,1}, Units);
+<span class="keyword">else</span>
+    fprintf(fid, <span class="string">'"ZSize:=", "%s"), _\n'</span>, Size{3,1});
+<span class="keyword">end</span>
+
+<span class="comment">% Box Attributes.</span>
+fprintf(fid, <span class="string">'Array("NAME:Attributes", _\n'</span>);
+fprintf(fid, <span class="string">'"Name:=", "%s", _\n'</span>, Name);
+fprintf(fid, <span class="string">'"Flags:=", "", _\n'</span>);
+fprintf(fid, <span class="string">'"Color:=", "(132 132 193)", _\n'</span>);
+fprintf(fid, <span class="string">'"Transparency:=", 0.75, _\n'</span>);
+fprintf(fid, <span class="string">'"PartCoordinateSystem:=", "Global", _\n'</span>);
+fprintf(fid, <span class="string">'"MaterialName:=", "vacuum", _\n'</span>);
+fprintf(fid, <span class="string">'"SolveInside:=", true)\n'</span>);
+
+<span class="comment">% Add Holes.</span>
+nHoles = length(varargin)/3;
+
+<span class="comment">% For each Hole Request create cylinder that satisfies the request and then</span>
+<span class="comment">% subtract it from the Box.</span>
+<span class="keyword">for</span> iH = 1:nHoles,
+	Center = varargin{3*(iH-1) + 1};
+	Radius = varargin{3*(iH-1) + 2};
+	Axis   = upper(varargin{3*(iH-1) + 3});
+
+	<span class="keyword">switch</span>(Axis)
+		<span class="keyword">case</span> <span class="string">'X'</span>,
+			Center(1) = Start(1);
+			Length = Size(1);
+		<span class="keyword">case</span> <span class="string">'Y'</span>,
+			Center(2) = Start(2);
+			Length = Size(2);
+		<span class="keyword">case</span> <span class="string">'Z'</span>,
+			Center(3) = Start(3);
+			Length = Size(3);
+	<span class="keyword">end</span>;
+
+	hfssCylinder(fid, strcat(Name, <span class="string">'_subhole'</span>, num2str(iH)), Axis, <span class="keyword">...</span>
+	             Center, Radius, Length, Units);
+	hfssSubtract(fid, Name, strcat(Name, <span class="string">'_subhole'</span>, num2str(iH)));
+<span class="keyword">end</span>;
+</pre><pre class="codeoutput error">Error using hfssBox (line 61)
+Not enough input arguments.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% function hfssBox(fid, Name, Start, Size, Units, [Center1], [Radius1], ...
+%                  [Axis1], [Center2], [Radius2], [Axis2], ...)
+% 
+% Description :
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Create the VB Script necessary to create a Box (or Cuboid) in HFSS. This 
+% function also provides for optional holes (specified by their Center, 
+% Radii and Axes) in the box. This feature is useful to allow things like
+% vias, cables etc., to penetrate the box without intersection violations.
+%
+% Parameters :
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% fid     - file identifier of the HFSS script file.
+% Name    - name of the box (appears in HFSS).
+% Start   - starting location of the box (specify as [x, y, z]).
+% Size    - size of the box (specify as [sx, sy, sz]).
+% Units   - units of the box (specify using either 'in', 'mm', 'meter' or 
+%           anything else defined in HFSS).
+% Center  - (Optional) center of the hole to be punched through the box.
+%           It can lie anywhere within or on the surface of the box.
+% Radius  - (Optional) radius of the hole to be punched through the box.
+% Axis    - (Optional) axis of the hole to be punched through the box.
+% 
+% Note :
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% If you happen to specify a hole that lies outside the box, it will have
+% no effect. The script will run without interruption. 
+%
+% Example :
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% fid = fopen('myantenna.vbs', 'wt');
+% ... 
+% % a Box with 2 holes punched thro' it.
+% hfssBox(fid, 'FR4_Base', [-bpHeight/2, -baseLength/2, 0], [bpHeight, ...
+%         baseLength, -baseThick], 'in', [cX1, cY1, cZ1], R1, 'Z',...
+%         [cX2, cY2, cZ2], R2, 'X');
+%
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% This file is part of HFSS-MATLAB-API.
+%
+% HFSS-MATLAB-API is free software; you can redistribute it and/or modify it 
+% under the terms of the GNU General Public License as published by the Free 
+% Software Foundation; either version 2 of the License, or (at your option) 
+% any later version.
+%
+% HFSS-MATLAB-API is distributed in the hope that it will be useful, but 
+% WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+% or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+% for more details.
+%
+% You should have received a copy of the GNU General Public License along with
+% Foobar; if not, write to the Free Software Foundation, Inc., 59 Temple 
+% Place, Suite 330, Boston, MA  02111-1307  USA
+%
+% Copyright 2004, Vijay Ramasami (rvc@ku.edu)
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+function hfssBox(fid, Name, Start, Size, Units, varargin)
+Start = reshape(Start, length(Start), 1);
+Size = reshape(Size, length(Size), 1);
+if iscell(Start)
+    1;
+else
+    Start = mat2cell(Start,[1,1,1],1);
+end
+if iscell(Size)
+    1;
+else
+    Size = mat2cell(Size,[1,1,1],1);
+end
+
+% Preamble.
+fprintf(fid, '\n');
+fprintf(fid, 'oEditor.CreateBox _\n');
+
+% Box Parameters.
+fprintf(fid, 'Array("NAME:BoxParameters", _\n');
+if isnumeric(Start{1,1})
+    fprintf(fid, '"XPosition:=", "%f%s", _\n', Start{1,1}, Units);
+else
+    fprintf(fid, '"XPosition:=", "%s", _\n', Start{1,1});
+end
+    
+if isnumeric(Start{2,1})
+    fprintf(fid, '"YPosition:=", "%f%s", _\n', Start{2,1}, Units);
+else
+    fprintf(fid, '"YPosition:=", "%s", _\n', Start{2,1});
+end
+  
+if isnumeric(Start{3,1})
+   fprintf(fid, '"ZPosition:=", "%f%s", _\n', Start{3,1}, Units);
+else
+     fprintf(fid, '"ZPosition:=", "%s", _\n', Start{3,1});
+end
+
+if isnumeric(Size{1,1})
+    fprintf(fid, '"XSize:=", "%f%s", _\n', Size{1,1}, Units);
+else
+    fprintf(fid, '"XSize:=", "%s", _\n', Size{1,1});
+end
+
+if isnumeric(Size{2,1})
+    fprintf(fid, '"YSize:=", "%f%s", _\n', Size{2,1}, Units);
+else
+    fprintf(fid, '"YSize:=", "%s", _\n', Size{2,1});
+end
+
+if isnumeric(Size{3,1})
+    fprintf(fid, '"ZSize:=", "%f%s"), _\n', Size{3,1}, Units);
+else
+    fprintf(fid, '"ZSize:=", "%s"), _\n', Size{3,1});
+end
+
+% Box Attributes.
+fprintf(fid, 'Array("NAME:Attributes", _\n');
+fprintf(fid, '"Name:=", "%s", _\n', Name);
+fprintf(fid, '"Flags:=", "", _\n');
+fprintf(fid, '"Color:=", "(132 132 193)", _\n');
+fprintf(fid, '"Transparency:=", 0.75, _\n');
+fprintf(fid, '"PartCoordinateSystem:=", "Global", _\n');
+fprintf(fid, '"MaterialName:=", "vacuum", _\n');
+fprintf(fid, '"SolveInside:=", true)\n');
+
+% Add Holes.
+nHoles = length(varargin)/3;
+
+% For each Hole Request create cylinder that satisfies the request and then 
+% subtract it from the Box.
+for iH = 1:nHoles,
+	Center = varargin{3*(iH-1) + 1};
+	Radius = varargin{3*(iH-1) + 2};
+	Axis   = upper(varargin{3*(iH-1) + 3});
+		
+	switch(Axis)
+		case 'X', 
+			Center(1) = Start(1);
+			Length = Size(1);
+		case 'Y', 
+			Center(2) = Start(2);
+			Length = Size(2);
+		case 'Z', 
+			Center(3) = Start(3);
+			Length = Size(3);
+	end;
+	
+	hfssCylinder(fid, strcat(Name, '_subhole', num2str(iH)), Axis, ... 
+	             Center, Radius, Length, Units);
+	hfssSubtract(fid, Name, strcat(Name, '_subhole', num2str(iH)));
+end;	                   
+
+##### SOURCE END #####
+--></body></html>
